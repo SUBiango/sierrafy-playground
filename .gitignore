@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.netlify/
+vendor/
+*.tgz
+
+.DS_Store
+.env
+.env.*
+!.env.example
+*.log

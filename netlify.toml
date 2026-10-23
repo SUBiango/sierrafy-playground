@@ -1,0 +1,34 @@
+# Static build. No server, no functions — the validator runs in the browser.
+
+[build]
+  command = "pnpm build"
+  publish = "dist"
+
+[build.environment]
+  # The SDK declares engines.node >= 20, and the smoke test is plain ESM.
+  NODE_VERSION = "20"
+
+# Fingerprinted assets are immutable; the HTML entry point must not be.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # The page already carries <meta name="robots" content="noindex">; this
+    # covers non-HTML responses and crawlers that only read headers, so the
+    # playground never competes with sierrafy.dev in search.
+    X-Robots-Tag = "noindex"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "DENY"
+    # Self-contained apart from Google Fonts. No connect-src: a NIN typed into
+    # this page must not be able to leave it, and nothing here calls out.
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; form-action 'none'; frame-ancestors 'none'; base-uri 'self'"

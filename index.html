@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NIN Validator · Sierrafy Playground</title>
+  <meta name="description" content="Try the Sierrafy NIN format validator in your browser. Sample data only; nothing leaves the page." />
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#0C110E" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <script>
+    // Apply saved theme before first paint (same key as sierrafy.dev).
+    (function () {
+      try {
+        var t = localStorage.getItem("sfy-theme");
+        if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="https://sierrafy.dev" aria-label="Sierrafy home">
+        <svg class="brand-glyph" viewBox="0 0 28 20" aria-hidden="true">
+          <rect x="1" y="1" width="26" height="18" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.8" />
+          <rect x="5" y="6" width="7" height="6" rx="1.2" fill="var(--accent)" />
+          <path d="M16 7h7M16 11h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+        </svg>
+        <span>sierrafy</span>
+      </a>
+      <span class="badge">playground</span>
+      <nav class="nav-links" aria-label="Playground pages">
+        <a href="/" aria-current="page">NIN validator</a>
+        <span class="nav-soon" title="Added when the OCR package ships">Document OCR <em>soon</em></span>
+      </nav>
+      <button class="theme-toggle" type="button" aria-label="Switch to light theme">
+        <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" /><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" /></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" /></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="main" class="wrap">
+    <section class="intro">
+      <p class="eyebrow">01 · Layer 1 of 5</p>
+      <h1>NIN validator</h1>
+      <p class="sub">Type a NIN and watch each format check run. Validation happens entirely in your browser — nothing is sent anywhere.</p>
+      <div class="pkg" id="pkg">
+        <code class="pkg-name"></code>
+        <span class="pkg-source"></span>
+        <code class="pkg-fn">validateNin()</code>
+      </div>
+    </section>
+
+    <div class="grid">
+      <!-- Input -->
+      <section class="panel input-panel" aria-labelledby="in-h">
+        <div class="panel-head">
+          <h2 id="in-h">Input</h2>
+          <kbd title="Press / to focus the input">/</kbd>
+        </div>
+
+        <label class="field-label" for="nin">NIN</label>
+        <input id="nin" class="nin-input" type="text" inputmode="text"
+               autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"
+               placeholder="K7M2QX4P" aria-describedby="nin-hint" />
+        <div class="cells" id="cells" aria-hidden="true"></div>
+        <p class="hint" id="nin-hint"><span id="count">0</span> / 8 characters · uppercase A–Z and 0–9</p>
+
+        <div class="samples">
+          <p class="field-label">Try a sample</p>
+          <div class="chips" id="chips"></div>
+        </div>
+
+        <div class="options">
+          <p class="field-label">Options</p>
+          <label class="opt-label" for="blacklist">Blocklist <span>one NIN per line</span></label>
+          <textarea id="blacklist" rows="2" spellcheck="false" autocapitalize="off">TEST0000</textarea>
+
+          <div class="opt-row">
+            <div>
+              <p class="opt-title">Checksum</p>
+              <p class="opt-note">Off until the algorithm is confirmed with NCRA.</p>
+            </div>
+            <span class="switch" role="switch" aria-checked="false" aria-disabled="true" aria-label="Checksum validation (unavailable)"><span></span></span>
+          </div>
+        </div>
+
+        <p class="privacy">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3Z" /></svg>
+          Use sample values only. Don't type a real person's NIN, especially when recording.
+        </p>
+      </section>
+
+      <!-- Result -->
+      <section class="panel result-panel" aria-labelledby="out-h">
+        <div class="panel-head">
+          <h2 id="out-h">Result</h2>
+          <span class="timing" id="timing"></span>
+        </div>
+
+        <div class="status" id="status" role="status" aria-live="polite"></div>
+
+        <ul class="checks" id="checks"></ul>
+
+        <div class="dark-island code-block">
+          <div class="tabs" role="tablist" aria-label="Code view">
+            <button role="tab" id="tab-res" aria-selected="true" aria-controls="pane-res" tabindex="0">Response</button>
+            <button role="tab" id="tab-call" aria-selected="false" aria-controls="pane-call" tabindex="-1">Call</button>
+            <button class="copy" type="button" id="copy" aria-label="Copy">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2" /><path d="M15.5 8.5V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7.5a2 2 0 0 0 2 2h2.5" /></svg>
+              <span>Copy</span>
+            </button>
+          </div>
+          <pre role="tabpanel" id="pane-res" aria-labelledby="tab-res" tabindex="0"><code id="json"></code></pre>
+          <pre role="tabpanel" id="pane-call" aria-labelledby="tab-call" tabindex="0" hidden><code id="call"></code></pre>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="wrap foot">
+    <p>Sierrafy is an independent open-source project, not an NCRA product. The sample NIN <code>K7M2QX4P</code> is fictional.</p>
+    <p class="foot-ver" id="foot-ver"></p>
+  </footer>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
