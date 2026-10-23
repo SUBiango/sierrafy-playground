@@ -61,7 +61,11 @@ Things that are easy to get wrong:
 
 ## Deployment
 
-Netlify project `play-sierrafy` → https://play.sierrafy.dev. Deploys are manual from a linked working copy (`netlify deploy --build [--prod]`); there's no git remote and therefore no CI build. Always check the draft URL before `--prod`.
+Netlify project `play-sierrafy` → https://play.sierrafy.dev, built from [SUBiango/sierrafy-playground](https://github.com/SUBiango/sierrafy-playground).
+
+Pushing to `main` builds and publishes; pull requests get deploy previews. Netlify reads the repo through a read-only deploy key and is notified by a repo webhook, so no GitHub App authorization is involved. `netlify deploy --build [--prod]` still works from a linked working copy for an out-of-band deploy, but it bypasses the git history — prefer a push.
+
+A deploy that doesn't fire is almost always the webhook rather than the build: check the repo's webhook deliveries before digging into Netlify.
 
 `netlify.toml` holds the build, cache and header config. The CSP's `connect-src 'none'` is load-bearing: the page's claim is that a NIN never leaves the browser, so anything that needs a network call needs that claim revisited first, not the header widened.
 
