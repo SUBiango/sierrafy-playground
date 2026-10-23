@@ -67,6 +67,10 @@ If a release changes the contract, `pnpm smoke` tells you where; update `src/mai
 
 Live at **https://play.sierrafy.dev** (Netlify project `play-sierrafy`).
 
+Pushes to `main` on [SUBiango/sierrafy-playground](https://github.com/SUBiango/sierrafy-playground) build and
+publish automatically. Pull requests get their own deploy preview URL, so a change can be watched running
+before it reaches the live domain.
+
 ```bash
 netlify deploy --build            # draft URL, for checking before it goes live
 netlify deploy --build --prod     # publish to play.sierrafy.dev
